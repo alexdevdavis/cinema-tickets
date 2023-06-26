@@ -18,7 +18,7 @@ describe("Ticket Service", () => {
   });
 
   describe("purchaseTickets method", () => {
-    test("returns a purchase summary string for one ticket request of a single adult ticket", () => {
+    test("returns a purchase summary for one ticket request of a single adult ticket", () => {
       const testTicketService = new TicketService();
       const singleAdultTicket = new TicketTypeRequest("ADULT", 1);
 
@@ -28,7 +28,7 @@ describe("Ticket Service", () => {
         "Thank you for your purchase. \n Order summary: \n tickets: 1 ADULT, \n total seats: 1 \n total payment: £20.00"
       );
     });
-    test("returns a purchase summary string for one ticket request of multiple adult tickets", () => {
+    test("returns a purchase summary for one ticket request of multiple adult tickets", () => {
       const testTicketService = new TicketService();
       const multipleAdultTickets = new TicketTypeRequest("ADULT", 3);
 
@@ -39,6 +39,20 @@ describe("Ticket Service", () => {
 
       expect(output).toBe(
         "Thank you for your purchase. \n Order summary: \n tickets: 3 ADULT, \n total seats: 3 \n total payment: £60.00"
+      );
+    });
+    test("returns a purchase summary for 2 ticket requests of same type", () => {
+      const testTicketService = new TicketService();
+      const firstRequest = new TicketTypeRequest("ADULT", 3);
+      const secondRequest = new TicketTypeRequest("ADULT", 5);
+
+      const output = testTicketService.purchaseTickets(
+        1,
+        firstRequest,
+        secondRequest
+      );
+      expect(output).toBe(
+        "Thank you for your purchase. \n Order summary: \n tickets: 8 ADULT, \n total seats: 8 \n total payment: £160.00"
       );
     });
   });

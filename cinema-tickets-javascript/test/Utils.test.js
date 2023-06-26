@@ -1,11 +1,11 @@
-import Utils from "../src/pairtest/utils/Utils";
+import Utils from "../src/pairtest/lib/RequestHandler";
 import TicketTypeRequest from "../src/pairtest/lib/TicketTypeRequest";
 
 describe("Utility Functions", () => {
   describe("handleRequests", () => {
     test("returns a parsed request object for single request for 1 adult ticket", () => {
       const adultRequest = new TicketTypeRequest("ADULT", 1);
-      const parsedRequest = Utils.handleRequests(adultRequest);
+      const parsedRequest = Utils.handleRequest(adultRequest);
       expect(parsedRequest).toMatchObject(
         expect.objectContaining({
           type: "ADULT",
@@ -17,7 +17,7 @@ describe("Utility Functions", () => {
     });
     test("returns a parsed request object for single request for multiple adult tickets", () => {
       const adultRequest = new TicketTypeRequest("ADULT", 10);
-      const parsedRequest = Utils.handleRequests(adultRequest);
+      const parsedRequest = Utils.handleRequest(adultRequest);
       expect(parsedRequest).toMatchObject(
         expect.objectContaining({
           type: "ADULT",

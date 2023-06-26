@@ -1,5 +1,5 @@
-class Utils {
-  static handleRequests(request) {
+class RequestHandler {
+  static handleRequest(request) {
     const numberOfTickets = request.getNoOfTickets();
     const handledRequest = {
       type: request.getTicketType(),
@@ -11,4 +11,5 @@ class Utils {
   }
 }
 
-export default Utils;
+export default RequestHandler
+;
