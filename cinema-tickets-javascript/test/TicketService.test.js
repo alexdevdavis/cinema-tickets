@@ -7,12 +7,15 @@ import { jest } from "@jest/globals";
 
 describe("Ticket Service", () => {
   let testTicketService;
+
   beforeEach(() => {
     testTicketService = new TicketService();
   });
+
   test("instantiates the TicketService class", () => {
     expect(testTicketService).toBeInstanceOf(TicketService);
   });
+
   test("instance exposes a single public method", () => {
     const ticketServicePublicMethods = Object.getOwnPropertyNames(
       Object.getPrototypeOf(testTicketService)
@@ -32,6 +35,7 @@ describe("Ticket Service", () => {
         "Thank you for your purchase. \n Order summary: \n tickets: 1 ADULT \n total seats: 1 \n total payment: £20.00"
       );
     });
+
     test("returns a purchase summary for one ticket request of multiple adult tickets", () => {
       const multipleAdultTickets = new TicketTypeRequest("ADULT", 3);
 
@@ -41,6 +45,7 @@ describe("Ticket Service", () => {
         "Thank you for your purchase. \n Order summary: \n tickets: 3 ADULT \n total seats: 3 \n total payment: £60.00"
       );
     });
+
     test("returns a purchase summary for 2 ticket requests of the same type", () => {
       const firstRequest = new TicketTypeRequest("ADULT", 3);
       const secondRequest = new TicketTypeRequest("ADULT", 5);
@@ -50,10 +55,12 @@ describe("Ticket Service", () => {
         firstRequest,
         secondRequest
       );
+
       expect(output).toBe(
         "Thank you for your purchase. \n Order summary: \n tickets: 8 ADULT \n total seats: 8 \n total payment: £160.00"
       );
     });
+
     test("returns a purchase summary for multiple ticket requests of two different types", () => {
       const multipleAdultTickets = new TicketTypeRequest("ADULT", 3);
       const oneChildTicket = new TicketTypeRequest("CHILD", 1);
@@ -68,6 +75,7 @@ describe("Ticket Service", () => {
         "Thank you for your purchase. \n Order summary: \n tickets: 3 ADULT, 1 CHILD \n total seats: 4 \n total payment: £70.00"
       );
     });
+
     test("returns a purchase summary for multiple ticket requests across three different ticket types", () => {
       const sixAdultTickets = new TicketTypeRequest("ADULT", 6);
       const threeChildTickets = new TicketTypeRequest("CHILD", 3);
@@ -84,6 +92,7 @@ describe("Ticket Service", () => {
         "Thank you for your purchase. \n Order summary: \n tickets: 6 ADULT, 3 CHILD, 10 INFANT \n total seats: 9 \n total payment: £150.00"
       );
     });
+
     test("Third-party services are called with expected values", () => {
       const paymentServiceSpy = jest.spyOn(
         TicketPaymentService.prototype,
@@ -97,12 +106,14 @@ describe("Ticket Service", () => {
       const twoAdultTickets = new TicketTypeRequest("ADULT", 2);
       const oneChildTicket = new TicketTypeRequest("CHILD", 1);
       const oneInfantTicket = new TicketTypeRequest("INFANT", 1);
+
       testTicketService.purchaseTickets(
         17745,
         twoAdultTickets,
         oneChildTicket,
         oneInfantTicket
       );
+
       expect(paymentServiceSpy).toHaveBeenCalledWith(17745, 50);
       expect(seatReservationSpy).toHaveBeenCalledWith(17745, 3);
       jest.restoreAllMocks();
@@ -111,19 +122,23 @@ describe("Ticket Service", () => {
     describe("Exception Handling", () => {
       let paymentServiceSpy;
       let seatReservationSpy;
+
       beforeEach(() => {
         paymentServiceSpy = jest.spyOn(
           TicketPaymentService.prototype,
           "makePayment"
         );
+
         seatReservationSpy = jest.spyOn(
           SeatReservationService.prototype,
           "reserveSeat"
         );
       });
+
       afterEach(() => {
         jest.restoreAllMocks();
       });
+
       test("throws an InvalidPurchaseException if no ADULT tickets requested", () => {
         const threeChildTickets = new TicketTypeRequest("CHILD", 3);
         const twoInfantTickets = new TicketTypeRequest("INFANT", 2);
@@ -173,6 +188,8 @@ describe("Ticket Service", () => {
         expect(() => {
           testTicketService.purchaseTickets(true, oneAdultTicket);
         }).toThrow(TypeError, "accountId must be an integer");
+        expect(paymentServiceSpy).not.toHaveBeenCalled();
+        expect(seatReservationSpy).not.toHaveBeenCalled();
       });
     });
   });

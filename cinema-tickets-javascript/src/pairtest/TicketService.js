@@ -29,10 +29,9 @@ export default class TicketService {
     }
 
     // ensure all purchase business rules are met
-    this.#validatePurchase(this.#ticketTypes.ADULT, this.#totalTicketCount);
+    this.#validatePurchase(this.#ticketTypes.ADULT, this.#totalTicketCount, accountId);
 
     // make calls to payment gateway and seat booking
-
     new TicketPaymentService().makePayment(accountId, this.#totalCost);
     new SeatReservationService().reserveSeat(accountId, this.#totalSeats);
 
