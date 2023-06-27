@@ -83,7 +83,7 @@ describe("Ticket Service", () => {
     });
 
     describe("Exception Handling", () => {
-      test("throws an InvalidPurchaseException for no ADULT tickets requested", () => {
+      test("throws an InvalidPurchaseException if no ADULT tickets requested", () => {
         const threeChildTickets = new TicketTypeRequest("CHILD", 3);
         const twoInfantTickets = new TicketTypeRequest("INFANT", 2);
 
@@ -104,6 +104,43 @@ describe("Ticket Service", () => {
         } catch (error) {
           expect(error).toBeInstanceOf(InvalidPurchaseException);
         }
+      });
+      test("throws an InvalidPurchaseException if total tickets exceeds 20", () => {
+        const tenAdultTickets = new TicketTypeRequest("ADULT", 10);
+        const tenChildTickets = new TicketTypeRequest("CHILD", 10);
+        const oneInfantTicket = new TicketTypeRequest("INFANT", 1);
+
+        expect(() => {
+          testTicketService.purchaseTickets(
+            1,
+            tenAdultTickets,
+            tenChildTickets,
+            oneInfantTicket
+          );
+        }).toThrow("Purchase must not exceed the maximum of 20 tickets.");
+
+        try {
+          testTicketService.purchaseTickets(
+            1,
+            tenAdultTickets,
+            tenChildTickets,
+            oneInfantTicket
+          );
+        } catch (error) {
+          expect(error).toBeInstanceOf(InvalidPurchaseException);
+        }
+      });
+      test("throws a TypeError if accountId is invalid", () => {
+        const oneAdultTicket = new TicketTypeRequest("ADULT", 1);
+        expect(() => {
+          testTicketService.purchaseTickets(0, oneAdultTicket);
+        }).toThrow("accountId must be an integer");
+        expect(() => {
+          testTicketService.purchaseTickets(-1, oneAdultTicket);
+        }).toThrow("accountId must be an integer");
+        expect(() => {
+          testTicketService.purchaseTickets(true, oneAdultTicket);
+        }).toThrow("accountId must be an integer");
       });
     });
   });

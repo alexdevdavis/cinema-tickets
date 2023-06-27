@@ -9,7 +9,9 @@ export default class PurchaseHandler {
     }
 
     if (totalTickets > 20) {
-      throw new InvalidPurchaseException();
+      throw new InvalidPurchaseException(
+        "Purchase must not exceed the maximum of 20 tickets."
+      );
     }
 
     return true;

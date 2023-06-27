@@ -29,19 +29,24 @@ export default class TicketService {
     }
 
     // ensure all purchase business rules are met
-    this.#validatePurchase(this.#ticketTypes.ADULT)
-
-    // make calls to payment gateway and seat booking
-    new TicketPaymentService().makePayment(accountId, this.#totalCost);
-    new SeatReservationService().reserveSeat(accountId, this.#totalSeats);
-
-    //generate purchase summary to return
-    const purchaseSummary = this.#generatePurchaseSummary(
-      this.#ticketTypes,
-      this.#totalSeats,
-      this.#totalCost
+    const isValid = this.#validatePurchase(
+      this.#ticketTypes.ADULT,
+      this.#totalTicketCount
     );
 
-    return purchaseSummary;
+    // make calls to payment gateway and seat booking
+    if (isValid) {
+      new TicketPaymentService().makePayment(accountId, this.#totalCost);
+      new SeatReservationService().reserveSeat(accountId, this.#totalSeats);
+
+      //generate purchase summary to return
+      const purchaseSummary = this.#generatePurchaseSummary(
+        this.#ticketTypes,
+        this.#totalSeats,
+        this.#totalCost
+      );
+
+      return purchaseSummary;
+    }
   }
 }

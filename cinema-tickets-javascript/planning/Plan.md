@@ -4,7 +4,7 @@
 
 - use TDD with coverage for each business rule.
 - focus on happy path, then sad path for each business rule
-- clean code: flatten layers of abstraction
+- clean code: encapsulation for separation of concerns
 
 ## Incrementing Complexity
 
@@ -14,12 +14,12 @@
 - [x] handles single adult ticket in single request
 - [x] handles multiple adult tickets in single request
 - [x] handles multiple adult ticket requests
-- [ ] handles multiple adult and child tickets
-- [ ] handles multiple adult and infant tickets
-- [ ] handles multiple adult, child, and infant tickets
+- [x] handles multiple adult and child tickets
+- [x] handles multiple adult and infant tickets
+- [x] handles multiple adult, child, and infant tickets
 
 ### Sad path
 
-- [ ] Expection for sans-adult request
-- [ ] Exception for > 20 tickets purchased
+- [x] Expection for sans-adult request
+- [x] Exception for > 20 tickets purchased
 - [ ] Exception for invalid accound id
