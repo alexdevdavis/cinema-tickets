@@ -1,6 +1,9 @@
 import TicketService from "../src/pairtest/TicketService";
 import InvalidPurchaseException from "../src/pairtest/lib/InvalidPurchaseException";
 import TicketTypeRequest from "../src/pairtest/lib/TicketTypeRequest";
+import TicketPaymentService from "../src/thirdparty/paymentgateway/TicketPaymentService";
+import SeatReservationService from "../src/thirdparty/seatbooking/SeatReservationService";
+import { jest } from "@jest/globals";
 
 describe("Ticket Service", () => {
   let testTicketService;
@@ -23,7 +26,7 @@ describe("Ticket Service", () => {
     test("returns a purchase summary for one ticket request of a single adult ticket", () => {
       const singleAdultTicket = new TicketTypeRequest("ADULT", 1);
 
-      const output = testTicketService.purchaseTickets(1, singleAdultTicket);
+      const output = testTicketService.purchaseTickets(2, singleAdultTicket);
 
       expect(output).toBe(
         "Thank you for your purchase. \n Order summary: \n tickets: 1 ADULT \n total seats: 1 \n total payment: £20.00"
@@ -43,7 +46,7 @@ describe("Ticket Service", () => {
       const secondRequest = new TicketTypeRequest("ADULT", 5);
 
       const output = testTicketService.purchaseTickets(
-        1,
+        86670321,
         firstRequest,
         secondRequest
       );
@@ -56,7 +59,7 @@ describe("Ticket Service", () => {
       const oneChildTicket = new TicketTypeRequest("CHILD", 1);
 
       const output = testTicketService.purchaseTickets(
-        1,
+        17998723478,
         multipleAdultTickets,
         oneChildTicket
       );
@@ -71,7 +74,7 @@ describe("Ticket Service", () => {
       const tenInfantTickets = new TicketTypeRequest("INFANT", 10);
 
       const output = testTicketService.purchaseTickets(
-        1,
+        1798798743,
         sixAdultTickets,
         threeChildTickets,
         tenInfantTickets
@@ -81,8 +84,46 @@ describe("Ticket Service", () => {
         "Thank you for your purchase. \n Order summary: \n tickets: 6 ADULT, 3 CHILD, 10 INFANT \n total seats: 9 \n total payment: £150.00"
       );
     });
+    test("Third-party services are called with expected values", () => {
+      const paymentServiceSpy = jest.spyOn(
+        TicketPaymentService.prototype,
+        "makePayment"
+      );
+      const seatReservationSpy = jest.spyOn(
+        SeatReservationService.prototype,
+        "reserveSeat"
+      );
+
+      const twoAdultTickets = new TicketTypeRequest("ADULT", 2);
+      const oneChildTicket = new TicketTypeRequest("CHILD", 1);
+      const oneInfantTicket = new TicketTypeRequest("INFANT", 1);
+      testTicketService.purchaseTickets(
+        17745,
+        twoAdultTickets,
+        oneChildTicket,
+        oneInfantTicket
+      );
+      expect(paymentServiceSpy).toHaveBeenCalledWith(17745, 50);
+      expect(seatReservationSpy).toHaveBeenCalledWith(17745, 3);
+      jest.restoreAllMocks();
+    });
 
     describe("Exception Handling", () => {
+      let paymentServiceSpy;
+      let seatReservationSpy;
+      beforeEach(() => {
+        paymentServiceSpy = jest.spyOn(
+          TicketPaymentService.prototype,
+          "makePayment"
+        );
+        seatReservationSpy = jest.spyOn(
+          SeatReservationService.prototype,
+          "reserveSeat"
+        );
+      });
+      afterEach(() => {
+        jest.restoreAllMocks();
+      });
       test("throws an InvalidPurchaseException if no ADULT tickets requested", () => {
         const threeChildTickets = new TicketTypeRequest("CHILD", 3);
         const twoInfantTickets = new TicketTypeRequest("INFANT", 2);
@@ -93,17 +134,13 @@ describe("Ticket Service", () => {
             threeChildTickets,
             twoInfantTickets
           );
-        }).toThrow("Purchase must include at least 1 ADULT ticket request.");
+        }).toThrow(
+          InvalidPurchaseException,
+          "Purchase must include at least 1 ADULT ticket request."
+        );
 
-        try {
-          testTicketService.purchaseTickets(
-            1,
-            threeChildTickets,
-            twoInfantTickets
-          );
-        } catch (error) {
-          expect(error).toBeInstanceOf(InvalidPurchaseException);
-        }
+        expect(paymentServiceSpy).not.toHaveBeenCalled();
+        expect(seatReservationSpy).not.toHaveBeenCalled();
       });
       test("throws an InvalidPurchaseException if total tickets exceeds 20", () => {
         const tenAdultTickets = new TicketTypeRequest("ADULT", 10);
@@ -117,30 +154,25 @@ describe("Ticket Service", () => {
             tenChildTickets,
             oneInfantTicket
           );
-        }).toThrow("Purchase must not exceed the maximum of 20 tickets.");
-
-        try {
-          testTicketService.purchaseTickets(
-            1,
-            tenAdultTickets,
-            tenChildTickets,
-            oneInfantTicket
-          );
-        } catch (error) {
-          expect(error).toBeInstanceOf(InvalidPurchaseException);
-        }
+        }).toThrow(
+          InvalidPurchaseException,
+          "Purchase must not exceed the maximum of 20 tickets."
+        );
+        expect(paymentServiceSpy).not.toHaveBeenCalled();
+        expect(seatReservationSpy).not.toHaveBeenCalled();
       });
+
       test("throws a TypeError if accountId is invalid", () => {
         const oneAdultTicket = new TicketTypeRequest("ADULT", 1);
         expect(() => {
           testTicketService.purchaseTickets(0, oneAdultTicket);
-        }).toThrow("accountId must be an integer");
+        }).toThrow(TypeError, "accountId must be an integer");
         expect(() => {
           testTicketService.purchaseTickets(-1, oneAdultTicket);
-        }).toThrow("accountId must be an integer");
+        }).toThrow(TypeError, "accountId must be an integer");
         expect(() => {
           testTicketService.purchaseTickets(true, oneAdultTicket);
-        }).toThrow("accountId must be an integer");
+        }).toThrow(TypeError, "accountId must be an integer");
       });
     });
   });

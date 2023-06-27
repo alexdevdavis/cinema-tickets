@@ -29,24 +29,20 @@ export default class TicketService {
     }
 
     // ensure all purchase business rules are met
-    const isValid = this.#validatePurchase(
-      this.#ticketTypes.ADULT,
-      this.#totalTicketCount
-    );
+    this.#validatePurchase(this.#ticketTypes.ADULT, this.#totalTicketCount);
 
     // make calls to payment gateway and seat booking
-    if (isValid) {
-      new TicketPaymentService().makePayment(accountId, this.#totalCost);
-      new SeatReservationService().reserveSeat(accountId, this.#totalSeats);
 
-      //generate purchase summary to return
-      const purchaseSummary = this.#generatePurchaseSummary(
-        this.#ticketTypes,
-        this.#totalSeats,
-        this.#totalCost
-      );
+    new TicketPaymentService().makePayment(accountId, this.#totalCost);
+    new SeatReservationService().reserveSeat(accountId, this.#totalSeats);
 
-      return purchaseSummary;
-    }
+    //generate purchase summary to return
+    const purchaseSummary = this.#generatePurchaseSummary(
+      this.#ticketTypes,
+      this.#totalSeats,
+      this.#totalCost
+    );
+
+    return purchaseSummary;
   }
 }

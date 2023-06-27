@@ -22,4 +22,4 @@
 
 - [x] Expection for sans-adult request
 - [x] Exception for > 20 tickets purchased
-- [ ] Exception for invalid accound id
+- [x] Exception for invalid accound id
