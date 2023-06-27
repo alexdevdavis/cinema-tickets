@@ -1,4 +1,3 @@
-import TicketTypeRequest from "./lib/TicketTypeRequest.js";
 import InvalidPurchaseException from "./lib/InvalidPurchaseException.js";
 import RequestHandler from "./lib/TicketRequestHandler.js";
 import TicketPurchaseSummary from "./lib/TicketPurchaseSummary.js";
@@ -27,7 +26,7 @@ export default class TicketService {
       this.#totalCost += cost;
     }
 
-    //
+    // check all purchase business rules are met
 
     //generate purchase summary to return
     const purchaseSummary = this.#generatePurchaseSummary(

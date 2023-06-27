@@ -7,7 +7,7 @@ export default class TicketRequestHandler {
     const handledRequest = {
       type: ticketType,
       ticketCount: numberOfTickets,
-      seats: numberOfTickets,
+      seats: ticketType !== "INFANT" ? numberOfTickets : 0,
       cost: TicketPrices.getTicketPriceByType(ticketType) * numberOfTickets,
     };
     return handledRequest;
